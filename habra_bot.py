@@ -24,6 +24,7 @@ def send_message_clean_and_quit(message):
 
 
 try:
+    check_envs()
     # The bot token
     updater = Updater(token=os.environ.get('BOT_TOKEN'), use_context=True)
 
