@@ -12,11 +12,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                      level=logging.INFO)
 
 
-def check_envs():
-    if not os.environ.get('BOT_TOKEN') or not os.environ.get('TARGET_URL'):
-        raise Exception('Missing env vars')
-
-
 def send_message_clean_and_quit(message):
     updater.bot.send_message(chat_id='-1001468860198', text=message)
     driver.quit()
@@ -24,7 +19,6 @@ def send_message_clean_and_quit(message):
 
 
 try:
-    check_envs()
     # The bot token
     updater = Updater(token=os.environ.get('BOT_TOKEN'), use_context=True)
 
@@ -44,10 +38,9 @@ try:
     driver.execute_script("arguments[0].click();", confirmationCheckBox)
     driver.execute_script("arguments[0].click();", submitBookingButton)
 
-    confirmationElement = driver.find_element_by_xpath(".//*[contains(text(), 'Veuillez recommencer ultérieurement')]")
-    send_message_clean_and_quit("There's no habra for the moment")
-except Exception as error:
-    print('Habra missing env vars : ', repr(error))
+    confirmationElement = driver.find_element_by_xpath(".//*[contains(text(), 'Veuillez recommencer')]")
+    driver.quit()
+    updater.stop()
 except NoSuchElementException:
     send_message_clean_and_quit("Habra is ALIVE")
 except TimeoutException:
