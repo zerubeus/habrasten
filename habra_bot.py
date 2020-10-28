@@ -63,6 +63,8 @@ except NoSuchElementException:
 
     silentremove("./screenshot.png")
 
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
     driver.save_screenshot("screenshot.png")
 
     updater.bot.send_photo(
