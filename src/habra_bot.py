@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from webdriver_manager.chrome import ChromeDriverManager
 from telegram.ext import Updater
 
 CHAT_ID = "-1001468860198"
@@ -14,8 +15,18 @@ CHAT_ID = "-1001468860198"
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
+updater = Updater(token=os.environ.get('BOT_TOKEN'), use_context=True)
 
-def silentremove(filename):
+chrome_options = Options()
+
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+
+driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), options=chrome_options)
+
+
+def silent_remove(filename):
     try:
         os.remove(filename)
     except OSError as e:
@@ -30,16 +41,6 @@ def send_message_clean_and_quit(message):
 
 
 try:
-    # The bot token
-    updater = Updater(token=os.environ.get('BOT_TOKEN'), use_context=True)
-
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-
-    driver = webdriver.Chrome(options=chrome_options)
-
     wait = WebDriverWait(driver, 10)
 
     driver.get(os.environ.get('TARGET_URL'))
@@ -61,14 +62,14 @@ try:
 except NoSuchElementException:
     updater.bot.send_message(chat_id=CHAT_ID, text="Harba is ALIVE")
 
-    silentremove("./screenshot.png")
+    silent_remove("screenshot.png")
 
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
     driver.save_screenshot("screenshot.png")
 
     updater.bot.send_photo(
-        chat_id=CHAT_ID, photo=open('./screenshot.png', 'rb'))
+        chat_id=CHAT_ID, photo=open('screenshot.png', 'rb'))
 except TimeoutException:
     send_message_clean_and_quit(
         "Habra : Loading Error the website maybe down a manual check can be a good idea!!!!")
